@@ -10,7 +10,7 @@ Local checks executed 2026-09-16–17 on Windows 11, Python 3.12.14. This is a s
 | G6 | PASS | Actual in-app browser: empty CSV gives schema error; sample loads; inspect reports 132 arrivals, 115 completions and 17 unfinished; Enter/Space activate inspection, assumptions and comparison. Default shows no confirmed feasible option, all six allocations, independent evaluation and sensitivities. JSON and HTML direct-download events succeeded; console had no errors/warnings. Narrow responsive layout visually inspected; screenshot `browser-results.png`. Benchmark: default 2.19 s / 29.98 MiB, bounded maximum 39.39 s / 46.70 MiB; both below fixed limits. See `benchmark.json`. |
 | G7 | PASS | `bandit -q -r src`: no findings after review of three deterministic `random.Random` usages (specific B311 suppressions; no security randomness). `pip_audit` found no known runtime dependency vulnerabilities; `dependency-audit.json`. Tracked-file secret scan passed. Runtime license metadata and notices reviewed; only original synthetic data redistributed. |
 | G8 | PASS | README installation and CLI paths exercised; specification, architecture, research/dataset findings, limitations and requirement/test mapping reviewed. |
-| G9 | PENDING | Private staging, exact-revision hosted CI, public visibility, clean remote quick start and release tag must still complete. GitHub Actions records will identify tested revisions. |
+| G9 | PASS | Private staging commit `5a2299a5470317d4a44a7229d096d79ec704a4e5` passed [hosted CI](https://github.com/GarethMackenzie/operations-decision-lab/actions/runs/35194438651) before public visibility was enabled. Anonymous clone succeeded. A new Python 3.12 environment in that clone completed the README locked install, package install, demo, exact numerical replay and `pip check`; its server rendered the packaged interface on port 8766. Final release revision is recorded by annotated tag `v0.1.0` and its own hosted CI. |
 | G10 | NOT APPLICABLE | No externally validated operational predictions. No authorized representative warehouse dataset, temporal holdout, customer interviews or intervention trial obtained. |
 
 ## Findings resolved during verification
@@ -27,3 +27,9 @@ Nominal capacity with two pickers and two packers is 17.142857 orders/hour, belo
 ## Limits of these checks
 
 The secret scan checks specified token/key patterns, not all possible secrets. Dependency audit is a point-in-time advisory check. Browser testing covers the supplied in-app Chromium surface, not every browser or formal accessibility certification. Tests verify the specified model; they do not validate its applicability to a warehouse. Benchmark results depend on machine load. External datasets and upstream research code are not included.
+
+## Release
+
+[Public repository](https://github.com/GarethMackenzie/operations-decision-lab) · [v0.1.0 prototype release and downloadable demo](https://github.com/GarethMackenzie/operations-decision-lab/releases/tag/v0.1.0) · [hosted checks](https://github.com/GarethMackenzie/operations-decision-lab/actions/workflows/verify.yml).
+
+The final follow-up changes record publication evidence and include its screenshot in the source distribution; application code is unchanged from the privately staged, tested revision. The tag is published only after the follow-up revision's hosted verification passes. Public source publication does not deploy a public application server.

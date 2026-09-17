@@ -4,6 +4,8 @@ A local workbench for comparing **hypothetical picking and packing staffing**. I
 
 **Synthetic research prototype — not externally validated staffing advice.** No customer interviews, adoption or productivity savings are claimed. The essential workflow uses no paid API and makes no external requests.
 
+[Download v0.1.0 and synthetic example reports](https://github.com/GarethMackenzie/operations-decision-lab/releases/tag/v0.1.0) · [Verification workflow](https://github.com/GarethMackenzie/operations-decision-lab/actions/workflows/verify.yml)
+
 ## The decision it makes explicit
 
 At 18 arrivals/hour, 6 minutes picking and 7 minutes packing per order, two pickers can serve 20/hour but two packers only **17.14/hour**. No allocation of four dedicated workers sustains that demand. The default example reports **NO CONFIRMED FEASIBLE OPTION**, even if one allocation is best among those tested. Simulations stop at shift end and retain unfinished orders.

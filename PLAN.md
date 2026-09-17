@@ -6,7 +6,7 @@ Started 2026-09-15. User authorized execution of the attached master prompt.
 2. **Complete — Specification.** Synthetic prototype scope, architecture and gates fixed before implementation.
 3. **Complete — Implementation.** CSV inspection, bounded simulation, staffing comparison, uncertainty, costs and reproducible reports.
 4. **Complete — Local verification.** 49 tests, clean wheel, browser downloads, security and performance checks passed; see evidence/VERIFICATION.md.
-5. **In progress — Hosted release.** Identity verified as GarethMackenzie; target absent. Private staging only after local gates; hosted CI then public visibility, remote quick start and tag.
+5. **Complete — Hosted release.** Created private staging under GarethMackenzie after local gates; exact-revision CI passed, public visibility and anonymous clone verified, clean remote install/replay/server passed. Annotated release tag follows final documentation CI. See evidence/VERIFICATION.md and the GitHub release for revision evidence.
 
 ## Starting point
 

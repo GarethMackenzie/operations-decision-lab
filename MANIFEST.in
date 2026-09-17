@@ -5,4 +5,4 @@ recursive-include scripts *.py
 recursive-include tests *.py
 recursive-include src/decision_lab/static *.html *.css *.js
 recursive-include src/decision_lab/samples *.csv *.md
-recursive-include evidence *.md *.json
+recursive-include evidence *.md *.json *.png
