@@ -1,0 +1,17 @@
+.venv*/
+.research-sources/
+.pytest_cache/
+pytest-cache-files-*/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+*.egg-info/
+build/
+dist/
+operations_decision_lab-*/
+reports/
+.env
+.env.*
+*.log
+scratch/

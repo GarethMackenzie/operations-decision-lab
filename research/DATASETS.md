@@ -1,0 +1,31 @@
+# Dataset assessment
+
+Accessed 2026-09-15/16. Rank is fitness for the proposed two-stage decision, not general data quality.
+
+| Rank | Candidate | Provenance / permission | Fitness and observed limitations |
+|---|---|---|---|
+| 1 for demo | Project-generated synthetic event log | Generator, fixed seed, MIT project data grant; no personal data | Exact semantics and known truth; verifies software, cannot validate real predictions |
+| 1 for real validation (not acquired) | Consented WMS + roster + time-study extract | Written owner authorization and publication/retention terms required | Best potential fit; unavailable in this task |
+| 2 | [Footwear warehouse picking, Mendeley V1](https://data.mendeley.com/datasets/pf2w725pw3/1), DOI 10.17632/pf2w725pw3.1 | Rodrigo Furlan de Assis, 24 Dec 2024; landing page CC BY 4.0; WMS SQL extraction with anonymization/randomization | Relevant warehouse domain, but actual service/packing semantics remain unverified |
+| 3 | [BPI Challenge 2019](https://icpmconference.org/2019/icpm-2019/contests-challenges/bpi-challenge-2019/) | Official purchase-to-pay challenge, van Dongen; [4TU DOI](https://doi.org/10.4121/uuid:d06aff4b-79f0-45e6-8ec8-e19730c248f1) | Wrong process for picking/packing; useful event-data quality study, not staffing calibration |
+| 4 | log-distance-measures / Simod test fixtures | Repository test assets inspected; Apache-2.0 source license does not establish provenance of every underlying operational dataset | Tiny controlled fixtures useful for metric tests; do not redistribute upstream operational logs |
+
+## Actual inspection and access limitations
+
+Mendeley browser file inventory includes `Customer_Order.csv` (9.02 MB), `Picking_Wave.csv` (9.23 MB), storage strategies, layouts, product and navigation files, a notebook and README. Landing page describes operator/time data and randomized anonymization. Direct CSV/landing-page shell requests returned HTTP 403; browser preview did not render records. Download was attempted, but no accessible local CSV was established. **Schema/sample verification BLOCKED**, not assumed from marketing description. No external data copied into the public demo. Packing service, resource calendars, pauses, timestamp zones and redistribution of any underlying third-party material need record-level confirmation.
+
+Official BPI description reports case = purchase document + item, attributes including `concept:name`, purchasing document/item and matching flags; users include automated batch accounts and missing/NONE values. It describes purchase-to-pay and repeated receipts/invoices. The 4TU DOI endpoint returned 403, so repository license was not independently confirmed. The publisher's [CSV ZIP](https://icpmconference.org/2019/wp-content/uploads/sites/6/2019/02/BPIChallenge2019CSV.zip) was successfully read in memory on 2026-09-16: archive member `BPI_Challenge_2019.csv`. Actual headers include `eventID ` (trailing space), `case concept:name`, `event User`, `event org:resource`, `event concept:name`, `event Cumulative net worth (EUR)`, and `event time:timestamp`; there are no start/end service columns. First record: activity `Vendor creates invoice`, resource/user `NONE`, timestamp `26-01-1948 23:59:00.000` with no offset. That anomalous date must be investigated rather than silently accepted as 2018 exposure; only the first record/header were sampled, so missingness/outlier prevalence is unknown. Raw operational records are not included in this project. Completion events are not active service durations. Multiple documents/items and batch events also make a simple order/resource mapping unsafe.
+
+Inspected test fixture `test_event_log_1.csv`: columns `Resource,Activity,start_time,end_time,case_id`; sample `Marcus,A,2006-11-07 10:30:00+02:00,2006-11-07 10:30:00+02:00,trace-01`. Equal start and end means zero elapsed time; these fixtures are not evidence of six- or seven-minute warehouse service. This sample is recorded solely as a schema illustration.
+
+## Supported product schema
+
+UTF-8 CSV, one row per order: `order_id,arrival_time,pick_start,pick_end,pack_start,pack_end` with optional `picker,packer`. Offset-aware ISO 8601 timestamps; blank incomplete stages allowed only as a sequential prefix. `arrival_time` means release into the picking queue, not customer checkout. Completed stage intervals are elapsed processing intervals, not proven active labor. The analyst must explicitly confirm that observed intervals are uninterrupted active service before adopting their means. Completion-only logs remain descriptive and require manual assumptions; no silent imputation.
+
+User provides a separate observation start/end. Only arrivals within the window form the arrival-rate denominator. Cases arriving before it are initial WIP and reported separately; arrivals after it are rejected. Endpoints after the window are treated as unobserved, not evidence leaked into it. Completed-only cycle statistics explicitly warn about censoring. Resource overlaps are flagged as incompatible with a dedicated single-task worker model. Unknown calendars and breaks are never inferred from timestamp gaps.
+
+## Requirements for a permitted operational dataset
+
+Written purpose/permission; pseudonymous order/worker IDs; timestamp timezone and clock convention; release/start/complete semantics; all arrivals including unfinished/cancelled work; observation bounds; beginning backlog and stage/age; roster, roles and planned/unplanned breaks; quantities/SKU mix, batching, travel and shared-resource behavior; explicit active-time measurements; wage/cost assumptions; missingness/duplicate audit; consented retention/export scope. No customer names, addresses, order contents or credentials are needed.
+
+External validation plan: reserve later complete shifts before tuning; retain pre-boundary WIP and right-censored jobs, with exposure denominators. Compare hourly arrivals/completions, cycle and wait distributions, queue/WIP trajectories and worker occupancy. Report uncertainty and errors by shift and task mix, not one fit score. Refit only on training data. A staffing intervention requires a controlled/monitored pilot and stop criteria; historical fit alone is insufficient.

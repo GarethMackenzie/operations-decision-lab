@@ -1,0 +1,37 @@
+name: Verify prototype
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.lock
+      - run: python -m pip install --no-build-isolation --no-deps -e .
+      - run: python -m pip check
+      - run: python -m ruff check .
+      - run: python -m ruff format --check .
+      - run: python -m mypy
+      - run: python -m pytest -q
+      - run: python -m bandit -q -r src
+      - run: python scripts/secret_scan.py
+      - run: python -m pip_audit --no-deps --disable-pip -r requirements-runtime.lock
+      - run: python -m build --no-isolation
+      - run: python -m decision_lab demo --output reports/ci
+      - run: python -m decision_lab replay reports/ci/report.json
+      - name: Clean wheel smoke test
+        run: |
+          python -m venv /tmp/odl-clean
+          /tmp/odl-clean/bin/python -m pip install -r requirements.lock
+          /tmp/odl-clean/bin/python -m pip install --no-deps dist/*.whl
+          cd /tmp
+          /tmp/odl-clean/bin/python -m decision_lab demo --output odl-report
+          /tmp/odl-clean/bin/python -m decision_lab replay odl-report/report.json

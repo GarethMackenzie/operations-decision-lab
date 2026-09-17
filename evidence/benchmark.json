@@ -1,0 +1,24 @@
+{
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cases": [
+    {
+      "name": "default",
+      "seconds": 2.1922781000612304,
+      "peak_rss_mb": 29.9765625,
+      "time_limit_seconds": 15,
+      "memory_limit_mb": 512,
+      "status": "PASS",
+      "scenarios": 6
+    },
+    {
+      "name": "bounded maximum",
+      "seconds": 39.39126540010329,
+      "peak_rss_mb": 46.69921875,
+      "time_limit_seconds": 60,
+      "memory_limit_mb": 512,
+      "status": "PASS",
+      "scenarios": 15
+    }
+  ]
+}
