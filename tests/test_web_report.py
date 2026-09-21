@@ -17,6 +17,7 @@ def test_health_assets_and_security_headers(client):
     assert b"RESEARCH PROTOTYPE" in response.data
     assert "frame-ancestors 'none'" in response.headers["Content-Security-Policy"]
     assert client.get("/static/app.js").status_code == 200
+    assert client.get("/static/static-engine.js").status_code == 200
     assert client.get("/health").json == {"status": "ok"}
     assert client.get("/", headers={"Host": "attacker.invalid"}).status_code == 400
 

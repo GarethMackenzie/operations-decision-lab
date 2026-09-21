@@ -6,6 +6,23 @@ A local workbench for comparing **hypothetical picking and packing staffing**. I
 
 [Download v0.1.0 and synthetic example reports](https://github.com/GarethMackenzie/operations-decision-lab/releases/tag/v0.1.0) · [Verification workflow](https://github.com/GarethMackenzie/operations-decision-lab/actions/workflows/verify.yml)
 
+## Browser-only website
+
+The repository includes a GitHub Pages build at
+[`garethmackenzie.github.io/operations-decision-lab`](https://garethmackenzie.github.io/operations-decision-lab/).
+It runs CSV inspection, seeded simulations, staffing comparison, sensitivity checks and report
+exports entirely in the browser—no Python server or upload endpoint is required. After merging to
+`main`, select **Settings → Pages → Deploy from a branch → `main` → `/docs`** and save. GitHub then
+publishes the checked-in static snapshot without a server or deployment workflow. Uploaded CSV
+content remains in the current browser session.
+
+After changing browser assets, refresh that snapshot with
+`.venv/bin/python scripts/pages.py sync-docs` and commit the resulting `docs/` changes.
+
+Preview that exact project-site build locally with
+`.venv/bin/python scripts/pages.py serve --port 8766`, then open
+`http://127.0.0.1:8766/operations-decision-lab/`.
+
 ## The decision it makes explicit
 
 At 18 arrivals/hour, 6 minutes picking and 7 minutes packing per order, two pickers can serve 20/hour but two packers only **17.14/hour**. No allocation of four dedicated workers sustains that demand. The default example reports **NO CONFIRMED FEASIBLE OPTION**, even if one allocation is best among those tested. Simulations stop at shift end and retain unfinished orders.
