@@ -92,6 +92,29 @@ def test_assumptions_required_and_no_unattested_adoption():
         make_report(changed)
 
 
+def test_friction_requires_confirmation_and_is_exported():
+    body = sample_request()
+    body["config"].update(arrival_rate=2, max_workers=2, service_cv=0, target_fraction=0.5)
+    body["friction"] = {
+        "travel_congestion_minutes": 2,
+        "replenishment_delay_minutes": 0,
+        "inventory_exception_rate": 0,
+        "inventory_exception_recovery_minutes": 0,
+        "packing_rework_rate": 0,
+        "packing_rework_minutes": 0,
+        "manual_handling_risk": True,
+        "vehicle_pedestrian_interaction": False,
+        "aisle_or_storage_obstruction": False,
+    }
+    with pytest.raises(ValueError, match="Confirm warehouse-friction"):
+        make_report(body)
+    body["friction_confirmed"] = True
+    report = make_report(body)
+    assert report["warehouse_friction"]["active"] is True
+    assert report["warehouse_friction"]["adjusted_service_minutes"]["pick"] == 8
+    assert "Warehouse friction screen" in report_html(report)
+
+
 def test_valid_interval_adoption_and_mismatch():
     from datetime import datetime, timedelta
 

@@ -15,5 +15,7 @@
 | No customer need demonstrated | High | Label market assumptions; interviews before expansion | Interviews / trial behavior |
 | GitHub access or hosted check block | Medium | Preserve local artifact; no public release/tag until required gates pass | Authenticated destination and CI evidence |
 | Monte Carlo CI misunderstood | High | Interval for mean under fixed model; show replication values, sensitivity | Input uncertainty studies |
+| Generic warehouse issue list treated as a site benchmark | High | No prefilled friction values; source limits shown; require explicit local confirmation | Local WMS, exception, replenishment and safety observations |
+| Safety prompt treated as a safety audit | Critical | Safety flags never change capacity, cost or feasibility; state scope in UI/export | Competent site safety assessment and applicable regulation review |
 
 Owner: project maintainer, GarethMackenzie. Review after each new dataset, model extension or dependency update. No risk is closed solely because tests exist.

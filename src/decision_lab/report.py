@@ -12,6 +12,7 @@ from typing import Any
 from . import __version__
 from .analysis import compare
 from .data import inspect_csv
+from .friction import WarehouseFriction, assess_friction, friction_dict
 from .model import Config, config_dict
 
 LIMITATIONS = [
@@ -34,6 +35,8 @@ LIMITATIONS = [
     "Marginal payroll is relative to the baseline.",
     "Confidence intervals describe replication means conditional on assumptions; "
     "sensitivity is not validation.",
+    "Warehouse-friction values are local planning assumptions. Timed effects are expected added "
+    "service minutes; safety flags are prompts, not a safety audit.",
     "Exports contain the exact input CSV. Review before sharing; "
     "uploaded data is held in memory only.",
 ]
@@ -55,6 +58,8 @@ def make_report(request: Any) -> dict[str, Any]:
         "service_source",
         "active_service_confirmed",
         "data_origin",
+        "friction",
+        "friction_confirmed",
     }
     if set(request) - allowed:
         raise ValueError("Unsupported request fields.")
@@ -70,6 +75,12 @@ def make_report(request: Any) -> dict[str, Any]:
     }:
         raise ValueError("Unsupported data-origin label.")
     config = Config.parse(request.get("config", {}))
+    friction = WarehouseFriction.parse(request.get("friction", {}))
+    friction_confirmed = request.get("friction_confirmed", False)
+    if type(friction_confirmed) is not bool:
+        raise ValueError("Warehouse-friction confirmation must be true or false.")
+    if friction.has_inputs() and friction_confirmed is not True:
+        raise ValueError("Confirm warehouse-friction values before comparing their effect.")
     quality = inspect_csv(
         request.get("csv"), request.get("window_start"), request.get("window_end")
     )
@@ -100,14 +111,18 @@ def make_report(request: Any) -> dict[str, Any]:
         "active_service_confirmed": request.get("active_service_confirmed") is True,
         "data_origin": origin,
     }
+    if "friction" in request or "friction_confirmed" in request:
+        inputs["friction"] = friction_dict(friction)
+        inputs["friction_confirmed"] = friction_confirmed
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "model_version": __version__,
         "evidence_class": "HYPOTHETICAL — NOT EXTERNALLY VALIDATED",
         "input_sha256": hashlib.sha256(canonical(inputs).encode()).hexdigest(),
         "inputs": inputs,
         "data_quality": quality,
         "results": compare(config),
+        "warehouse_friction": assess_friction(config, friction),
         "limitations": LIMITATIONS,
         "environment": {
             "python": platform.python_version(),
@@ -138,6 +153,33 @@ def report_html(report: dict[str, Any]) -> str:
             + "</tr>"
         )
     warnings = "".join(f"<li>{html.escape(x)}</li>" for x in report["limitations"])
+    friction = report["warehouse_friction"]
+    friction_rows = (
+        "".join(
+            f"<li>{html.escape(item['issue'])}: {html.escape(item['action'])}</li>"
+            for item in friction["safety_flags"]
+        )
+        or "<li>No qualitative safety flags were supplied.</li>"
+    )
+    action_rows = "".join(f"<li>{html.escape(item)}</li>" for item in friction["actions"])
+    friction_comparison = ""
+    if friction["comparison"] is not None:
+        adjusted_result = friction["comparison"]
+        adjusted_evaluation = adjusted_result["evaluation"]
+        friction_comparison = (
+            "<p>Adjusted service means: "
+            f"pick {friction['base_service_minutes']['pick']:.2f} → "
+            f"{friction['adjusted_service_minutes']['pick']:.2f} minutes; "
+            f"pack {friction['base_service_minutes']['pack']:.2f} → "
+            f"{friction['adjusted_service_minutes']['pack']:.2f} minutes. "
+            f"Friction-adjusted selection: {adjusted_evaluation['pickers']} picking / "
+            f"{adjusted_evaluation['packers']} packing; "
+            f"{html.escape(adjusted_result['status'])}.</p>"
+        )
+    sources = " · ".join(
+        f'<a href="{html.escape(item["url"], quote=True)}">{html.escape(item["title"])}</a>'
+        for item in friction["sources"]
+    )
     encoded = html.escape(canonical(report))
     return f"""<!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -156,6 +198,9 @@ pre{{white-space:pre-wrap;overflow-wrap:anywhere;background:#f0f4f1;padding:20px
 <th>Scheduled payroll</th><th>Due-cohort SLA mean</th>
 <th>Unfinished mean</th><th>Conditional screen</th>
 </tr></thead><tbody>{"".join(rows)}</tbody></table>
+<h2>Warehouse friction screen</h2><p>{html.escape(friction["method_note"])}</p>
+{friction_comparison}<h3>Safety review prompts</h3><ul>{friction_rows}</ul>
+<h3>Local follow-up</h3><ul>{action_rows}</ul><p>Sources: {sources}</p>
 <h2>Interpretation and limits</h2><p>{html.escape(results["interval_method"])}</p>
 <ul>{warnings}</ul><h2>Complete reproducibility record</h2>
 <p>Includes original input CSV, observation bounds, assumptions, all replications,

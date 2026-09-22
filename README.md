@@ -64,6 +64,7 @@ Every report includes the exact submitted CSV text (browser text areas normalize
 - SLA cohort: new orders whose arrival + deadline <= shift end. Young arrivals are excluded; unfinished due orders count as failures. Completed-only cycle times may be optimistically biased.
 - Payroll = all scheduled worker-hours × wage, including breaks/idle time. CU means the user's chosen currency unit. Marginal payroll is relative to baseline; no overtime, penalties, revenue or causal savings.
 - Sensitivity holds selected staffing fixed and stresses arrivals, service means and variability. Supported input limits cap stress values, shown in exports.
+- Warehouse Friction adds user-entered travel/congestion, replenishment, inventory-exception and packing-rework time as expected service-time additions, then runs a separate full staffing comparison. Manual-handling, traffic and aisle/storage flags are safety review prompts only. They are not industry benchmarks, a safety audit or performance prediction.
 
 Unsupported: waves/batches, shared workers, skills, heterogeneous productivity, SKU/travel effects, seasonal demand, detailed calendars, overtime or multi-shift carryover. Nominal capacity is only a necessary workload screen. Public server deployment requires a separate security/hosting design.
 
@@ -71,7 +72,7 @@ Unsupported: waves/batches, shared workers, skills, heterogeneous productivity, 
 
 `data.py` → `model.py` → `analysis.py` → `report.py`; `web.py` and CLI share this core. SimPy provides simulation, Flask the interface API, Waitress the local server; plain HTML/CSS/JS has no build pipeline.
 
-- [Research dossier and competitor comparison](research/DOSSIER.md)
+- [Research dossier and competitor comparison](research/DOSSIER.md) · [Warehouse-friction research and sources](research/WAREHOUSE_ISSUES.md)
 - [Dataset assessment](research/DATASETS.md) · [Risk register](research/RISKS.md)
 - [Specification and release gates](docs/SPECIFICATION.md) · [Architecture decision](docs/ARCHITECTURE.md)
 - [Verification evidence](evidence/VERIFICATION.md) · [Requirement traceability](docs/TRACEABILITY.md)
