@@ -10,6 +10,7 @@
 | R6 honest costs | `model.capacity`, report/UI | Payroll and marginal cost hand tests; no overtime/penalty implementation |
 | R7 reproducible exports | `report.canonical`, `report_html`, CLI replay | API/HTML/JSON equivalence, escaping; clean installed CLI demo and replay |
 | R8 interface and privacy | static UI, `web.create_app`, Waitress loopback | Actual browser flow, keyboard, invalid state; API host/origin/size/type tests |
+| Warehouse friction | `friction.WarehouseFriction`, `assess_friction`, UI and report | Explicit service-time arithmetic, invalid assumptions, separate adjusted comparison, confirmation and HTML export tests |
 | G4 independent calculation | Test-only server-availability recurrence | Four staffing combinations compared order-by-order against SimPy |
 | G6 performance | `scripts/benchmark.py` | Full default and maximum-load comparison, wall clock + peak RSS |
 | G7 security | CSP, strict JSON/CSV, no disk uploads, one compute lock | Bandit; advisory audit; tracked-file secret scan; invalid input tests |

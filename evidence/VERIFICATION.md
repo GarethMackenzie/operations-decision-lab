@@ -13,6 +13,18 @@ Local checks executed 2026-09-16–17 on Windows 11, Python 3.12.14. This is a s
 | G9 | PASS | Private staging commit `5a2299a5470317d4a44a7229d096d79ec704a4e5` passed [hosted CI](https://github.com/GarethMackenzie/operations-decision-lab/actions/runs/35194438651) before public visibility was enabled. Anonymous clone succeeded. A new Python 3.12 environment in that clone completed the README locked install, package install, demo, exact numerical replay and `pip check`; its server rendered the packaged interface on port 8766. Final release revision is recorded by annotated tag `v0.1.0` and its own hosted CI. |
 | G10 | NOT APPLICABLE | No externally validated operational predictions. No authorized representative warehouse dataset, temporal holdout, customer interviews or intervention trial obtained. |
 
+## Warehouse friction extension verification — 2026-09-22
+
+The extension adds only local inputs that a user explicitly confirms. Its cited research context is documented in [research/WAREHOUSE_ISSUES.md](../research/WAREHOUSE_ISSUES.md); no survey percentage or other external figure supplies an app default.
+
+| Check | Status | Executed evidence |
+|---|---|---|
+| Unit and integration | PASS | `pytest -q --tb=short -p no:cacheprovider`: **57 passed in 7.99 s**, including timed-adjustment arithmetic, safety-only prompts, invalid inputs and confirmation/export enforcement. |
+| Static checks | PASS | `ruff check .`, `ruff format --check .`, and `mypy --cache-dir=nul` passed. |
+| Security checks | PASS | `bandit -q -r src` and the tracked-file secret scan passed. `pip_audit --no-deps --disable-pip -r requirements-runtime.lock` reported no known vulnerabilities. |
+| Package build | PASS | `python -m build --no-isolation` produced the source distribution and wheel; both include `decision_lab/friction.py`, the updated static assets, tests and warehouse-issues research note. |
+| In-app workflow | PASS | Loaded the synthetic sample; supplied confirmed local delays, exception/rework rates and a manual-handling flag; ran the comparison. The results showed 6.00 → 9.00 min picking and 7.00 → 7.40 min packing, the separate adjusted capacity/result, safety prompt, follow-up actions and source links. Browser console had no warnings or errors. |
+
 ## Findings resolved during verification
 
 - A hand-computed CI expectation was corrected to the independently calculated sample-variance result; the implementation did not change to fit the incorrect expectation.

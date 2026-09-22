@@ -7,6 +7,7 @@ Started 2026-09-15. User authorized execution of the attached master prompt.
 3. **Complete — Implementation.** CSV inspection, bounded simulation, staffing comparison, uncertainty, costs and reproducible reports.
 4. **Complete — Local verification.** 49 tests, clean wheel, browser downloads, security and performance checks passed; see evidence/VERIFICATION.md.
 5. **Complete — Hosted release.** Created private staging under GarethMackenzie after local gates; exact-revision CI passed, public visibility and anonymous clone verified, clean remote install/replay/server passed. Annotated release tag follows final documentation CI. See evidence/VERIFICATION.md and the GitHub release for revision evidence.
+6. **Complete — Warehouse friction extension.** Added sourced, explicit local-planning inputs for congestion/travel, replenishment, inventory exceptions, packing rework and safety conditions. Timed effects produce a separate adjusted comparison; safety flags only add review prompts. Generic research figures are never used as site facts or model defaults.
 
 ## Starting point
 
