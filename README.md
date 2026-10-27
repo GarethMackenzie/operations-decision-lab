@@ -65,6 +65,7 @@ Every report includes the exact submitted CSV text (browser text areas normalize
 - Payroll = all scheduled worker-hours × wage, including breaks/idle time. CU means the user's chosen currency unit. Marginal payroll is relative to baseline; no overtime, penalties, revenue or causal savings.
 - Sensitivity holds selected staffing fixed and stresses arrivals, service means and variability. Supported input limits cap stress values, shown in exports.
 - Warehouse Friction adds user-entered travel/congestion, replenishment, inventory-exception and packing-rework time as expected service-time additions, then runs a separate full staffing comparison. Manual-handling, traffic and aisle/storage flags are safety review prompts only. They are not industry benchmarks, a safety audit or performance prediction.
+- Data inspection reports elapsed pick/pack interval counts, medians, 90th percentiles and sample CVs. Users may explicitly adopt the higher eligible stage CV as a conservative common model input after confirming that the intervals represent active service.
 
 Unsupported: waves/batches, shared workers, skills, heterogeneous productivity, SKU/travel effects, seasonal demand, detailed calendars, overtime or multi-shift carryover. Nominal capacity is only a necessary workload screen. Public server deployment requires a separate security/hosting design.
 

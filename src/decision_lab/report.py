@@ -35,6 +35,9 @@ LIMITATIONS = [
     "Marginal payroll is relative to the baseline.",
     "Confidence intervals describe replication means conditional on assumptions; "
     "sensitivity is not validation.",
+    "Observed interval percentiles and variation describe recorded elapsed work only. "
+    "A conservatively adopted common CV uses the higher observed stage CV and still requires "
+    "active-service confirmation.",
     "Warehouse-friction values are local planning assumptions. Timed effects are expected added "
     "service minutes; safety flags are prompts, not a safety audit.",
     "Exports contain the exact input CSV. Review before sharing; "
@@ -56,6 +59,7 @@ def make_report(request: Any) -> dict[str, Any]:
         "config",
         "assumptions_confirmed",
         "service_source",
+        "variability_source",
         "active_service_confirmed",
         "data_origin",
         "friction",
@@ -68,6 +72,12 @@ def make_report(request: Any) -> dict[str, Any]:
     source = request.get("service_source", "manual")
     if not isinstance(source, str) or source not in {"manual", "attested_intervals"}:
         raise ValueError("Service source must be manual or attested_intervals.")
+    variability_source = request.get("variability_source", "manual")
+    if not isinstance(variability_source, str) or variability_source not in {
+        "manual",
+        "conservative_observed_intervals",
+    }:
+        raise ValueError("Variability source must be manual or conservative_observed_intervals.")
     origin = request.get("data_origin", "user-provided; provenance unverified")
     if not isinstance(origin, str) or origin not in {
         "synthetic demo",
@@ -101,6 +111,21 @@ def make_report(request: Any) -> dict[str, Any]:
                 raise ValueError(
                     "Adopted service means must match the inspected intervals exactly."
                 )
+    if variability_source == "conservative_observed_intervals":
+        observed_cv = quality["conservative_common_service_cv"]
+        if request.get("active_service_confirmed") is not True or observed_cv is None:
+            raise ValueError(
+                "Observed variability adoption requires complete eligible data "
+                "and active-service confirmation."
+            )
+        if observed_cv > 2:
+            raise ValueError(
+                "Observed variability exceeds the model's supported service-CV limit of 2."
+            )
+        if abs(config.service_cv - observed_cv) > 1e-6:
+            raise ValueError(
+                "Adopted service variability must match the conservative observed CV exactly."
+            )
     inputs = {
         "csv": request["csv"],
         "window_start": request["window_start"],
@@ -114,8 +139,10 @@ def make_report(request: Any) -> dict[str, Any]:
     if "friction" in request or "friction_confirmed" in request:
         inputs["friction"] = friction_dict(friction)
         inputs["friction_confirmed"] = friction_confirmed
+    if "variability_source" in request:
+        inputs["variability_source"] = variability_source
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "model_version": __version__,
         "evidence_class": "HYPOTHETICAL — NOT EXTERNALLY VALIDATED",
         "input_sha256": hashlib.sha256(canonical(inputs).encode()).hexdigest(),

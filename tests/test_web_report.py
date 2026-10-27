@@ -139,12 +139,20 @@ def test_valid_interval_adoption_and_mismatch():
     )
     report = make_report(body)
     assert report["inputs"]["service_source"] == "attested_intervals"
+    body["config"]["service_cv"] = 0
+    body["variability_source"] = "conservative_observed_intervals"
+    report = make_report(body)
+    assert report["inputs"]["variability_source"] == "conservative_observed_intervals"
+    body["config"]["service_cv"] = 0.1
+    with pytest.raises(ValueError, match="variability"):
+        make_report(body)
+    body["config"]["service_cv"] = 0
     body["config"]["pick_minutes"] = 5
     with pytest.raises(ValueError, match="match"):
         make_report(body)
 
 
-@pytest.mark.parametrize("key", ["service_source", "data_origin"])
+@pytest.mark.parametrize("key", ["service_source", "variability_source", "data_origin"])
 def test_unhashable_api_fields_are_useful_errors(client, key):
     body = sample_request()
     body[key] = []
