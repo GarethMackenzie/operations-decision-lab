@@ -6,7 +6,8 @@ import csv
 import hashlib
 import io
 from datetime import datetime
-from statistics import mean
+from math import floor
+from statistics import mean, stdev
 from typing import Any
 
 MAX_BYTES = 2_000_000
@@ -14,6 +15,34 @@ MAX_ROWS = 5000
 COLUMNS = {"order_id", "arrival_time", "pick_start", "pick_end", "pack_start", "pack_end"}
 OPTIONAL = {"picker", "packer"}
 TIMES = ("arrival_time", "pick_start", "pick_end", "pack_start", "pack_end")
+
+
+def percentile(values: list[float], fraction: float) -> float | None:
+    """Linearly interpolate a percentile without treating it as a forecast."""
+
+    if not values:
+        return None
+    ordered = sorted(values)
+    position = (len(ordered) - 1) * fraction
+    lower = floor(position)
+    upper = min(lower + 1, len(ordered) - 1)
+    return ordered[lower] + (ordered[upper] - ordered[lower]) * (position - lower)
+
+
+def interval_profile(values: list[float]) -> dict[str, float | int | None]:
+    """Describe elapsed recorded intervals; this does not establish active service."""
+
+    if not values:
+        return {"count": 0, "mean": None, "p50": None, "p90": None, "sample_cv": None}
+    observed_mean = mean(values)
+    sample_deviation = stdev(values) if len(values) > 1 else 0.0
+    return {
+        "count": len(values),
+        "mean": observed_mean,
+        "p50": percentile(values, 0.5),
+        "p90": percentile(values, 0.9),
+        "sample_cv": sample_deviation / observed_mean if observed_mean else None,
+    }
 
 
 def timestamp(value: object) -> datetime:
@@ -104,6 +133,7 @@ def inspect_csv(text: object, window_start: object, window_end: object) -> dict[
     ]
     completions = sum(r["pack_end"] is not None and start <= r["pack_end"] <= end for r in rows)
     means = {}
+    profiles: dict[str, dict[str, float | int | None]] = {}
     overlaps = 0
     missing_resources = 0
     by_resource: dict[str, list[tuple[datetime, datetime]]] = {}
@@ -116,9 +146,9 @@ def inspect_csv(text: object, window_start: object, window_end: object) -> dict[
             and r[stage + "_end"] is not None
             and r[stage + "_start"] >= start
         ]
-        means[stage] = (
-            mean((b - a).total_seconds() / 60 for a, b, _ in intervals) if intervals else None
-        )
+        durations = [(b - a).total_seconds() / 60 for a, b, _ in intervals]
+        profiles[stage] = interval_profile(durations)
+        means[stage] = profiles[stage]["mean"]
         for a, b, who in intervals:
             if not who:
                 missing_resources += 1
@@ -173,6 +203,13 @@ def inspect_csv(text: object, window_start: object, window_end: object) -> dict[
         and not missing_resources
         and all(value is not None for value in means.values())
     )
+    conservative_cv = (
+        max(profiles["pick"]["sample_cv"], profiles["pack"]["sample_cv"])
+        if eligible
+        and profiles["pick"]["sample_cv"] is not None
+        and profiles["pack"]["sample_cv"] is not None
+        else None
+    )
     return {
         "sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
         "rows": len(rows),
@@ -185,6 +222,8 @@ def inspect_csv(text: object, window_start: object, window_end: object) -> dict[
         "throughput_observed": completions / hours,
         "completed_cycle_mean": mean(cycles) if cycles else None,
         "elapsed_interval_means": means,
+        "elapsed_interval_profiles": profiles,
+        "conservative_common_service_cv": conservative_cv,
         "missing_starts": missing_starts,
         "overlap_count": overlaps,
         "shared_workers": shared_workers,

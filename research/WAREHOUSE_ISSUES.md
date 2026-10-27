@@ -19,3 +19,12 @@ Reviewed 2026-09-21. This note informed the Warehouse Friction screen. It is not
 - [2025 Warehouse/DC Operations Survey](https://www.scmr.com/article/2025-warehouse-dc-operations-survey-tech-adoption-marches-on), Supply Chain Management Review, November 2025. The article describes a 101-response industry survey. It is useful context for congestion, inventory and labor/data concerns, not a statistically representative global benchmark and not evidence about this user's operation.
 
 The tool intentionally excludes worker injury likelihood, legal compliance, incident costs, inventory accuracy prediction, slotting optimization, equipment reliability, waves, shared workers and causal intervention recommendations. Validate any input with local WMS, exception, replenishment, safety and roster data before using a scenario to inform a trial.
+
+## Measurement improvement: interval profiles
+
+The 2025–2026 WERC DC Measures framework covers internal order cycle time, inventory-count accuracy, order-picking accuracy, capacity and employee measures. The 2025 Warehouse/DC Operations Survey also reports that inventory accuracy, fill rate and productivity are widely tracked, while manual data capture remains common. The app can measure elapsed pick/pack interval distributions from its supported CSV, so the inspection screen now exposes each stage's count, mean, median, 90th percentile and sample coefficient of variation (CV).
+
+An eligible, complete observation window may supply a **conservative common CV**: the greater observed pick/pack CV. It is still an explicit model assumption, requires active-service confirmation and is bounded by the model's supported CV range. It does not measure order accuracy, inventory accuracy, dock-to-stock time, labor productivity or site performance.
+
+- [WERC DC Measures](https://werc.org/page/ASSESS-DC_Measures), accessed 2026-10-19. The 2025–2026 framework defines a balanced set of operational measures, including internal order cycle time, capacity/quality and employee metrics.
+- [2025 Warehouse/DC Operations Survey](https://www.scmr.com/article/2025-warehouse-dc-operations-survey-tech-adoption-marches-on), accessed 2026-10-19. Used as industry context for tracking inventory accuracy, fill rate and productivity, not as an input benchmark.

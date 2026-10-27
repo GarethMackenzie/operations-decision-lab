@@ -25,6 +25,16 @@ The extension adds only local inputs that a user explicitly confirms. Its cited 
 | Package build | PASS | `python -m build --no-isolation` produced the source distribution and wheel; both include `decision_lab/friction.py`, the updated static assets, tests and warehouse-issues research note. |
 | In-app workflow | PASS | Loaded the synthetic sample; supplied confirmed local delays, exception/rework rates and a manual-handling flag; ran the comparison. The results showed 6.00 → 9.00 min picking and 7.00 → 7.40 min packing, the separate adjusted capacity/result, safety prompt, follow-up actions and source links. Browser console had no warnings or errors. |
 
+## Observed interval-profile and dependency verification — 2026-10-19
+
+| Check | Status | Executed evidence |
+|---|---|---|
+| Unit and integration | PASS | `pytest -q --tb=short -p no:cacheprovider`: **59 passed in 8.27 s**, including elapsed-profile median/tail/CV calculations, conservative-CV report adoption and invalid source types. |
+| Static checks | PASS | `ruff check .`, `ruff format --check .`, and `mypy --cache-dir=nul src` passed with no findings. |
+| In-app workflow | PASS | Inspected a complete 10-order, non-overlapping local CSV. The UI reported 5.5-minute pick/pack medians, 9.1-minute p90s, 0.55 stage CVs and a 0.55 conservative common CV. It required the active-service checkbox before adopting the CV and then recorded the explicit source. Browser console had no warnings or errors. |
+| Security checks | PASS | `bandit -q -r src` and the tracked-file secret scan passed. Initial advisory audits identified Werkzeug 3.1.8 / PYSEC-2026-4312 and development-only urllib3 2.7.0 / PYSEC-2026-4175, 4176 and 4177. Locks were updated to Werkzeug 3.1.9 and urllib3 2.8.0; repeat runtime and development `pip_audit --no-deps --disable-pip` runs reported no known vulnerabilities. |
+| Package build | PASS | `python -m build --no-isolation` produced `operations_decision_lab-0.1.0.tar.gz` and `operations_decision_lab-0.1.0-py3-none-any.whl`, including the updated static assets and research note. |
+
 ## Findings resolved during verification
 
 - A hand-computed CI expectation was corrected to the independently calculated sample-variance result; the implementation did not change to fit the incorrect expectation.

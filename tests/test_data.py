@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 import pytest
 
 from decision_lab.data import inspect_csv
@@ -17,7 +19,46 @@ def test_observed_intervals_are_descriptive():
     assert q["elapsed_interval_means"] == {"pick": 6, "pack": 7}
     assert q["arrival_rate_observed"] == 1 / 8
     assert q["completed_cycle_mean"] == 15
+    assert q["elapsed_interval_profiles"]["pick"] == {
+        "count": 1,
+        "mean": 6,
+        "p50": 6,
+        "p90": 6,
+        "sample_cv": 0,
+    }
+    assert q["conservative_common_service_cv"] is None
     assert not q["eligible_for_attested_intervals"]
+
+
+def test_interval_profiles_report_tail_and_conservative_variation():
+    start = datetime.fromisoformat(START)
+    rows = []
+    for index in range(10):
+        began = start + timedelta(minutes=20 * index)
+        ended_pick = began + timedelta(minutes=index + 1)
+        ended_pack = ended_pick + timedelta(minutes=index + 1)
+        rows.append(
+            ",".join(
+                (
+                    str(index),
+                    began.isoformat(),
+                    began.isoformat(),
+                    ended_pick.isoformat(),
+                    ended_pick.isoformat(),
+                    ended_pack.isoformat(),
+                    f"P{index}",
+                    f"K{index}",
+                )
+            )
+        )
+    q = inspect_csv(HEADER + "\n".join(rows) + "\n", START, END)
+    profile = q["elapsed_interval_profiles"]["pick"]
+    assert q["eligible_for_attested_intervals"]
+    assert profile["count"] == 10
+    assert profile["mean"] == 5.5
+    assert profile["p50"] == 5.5
+    assert profile["p90"] == pytest.approx(9.1)
+    assert profile["sample_cv"] == pytest.approx(q["conservative_common_service_cv"])
 
 
 def test_completion_only_never_imputes_service():

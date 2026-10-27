@@ -8,6 +8,8 @@ Modules: `data.py` parses and describes; `model.py` defines assumptions and simu
 
 The friction comparison is a second complete evaluation with adjusted service means. It does not change the base scenario or silently infer a delay from the uploaded CSV. Qualitative safety flags cannot affect capacity, payroll, risk or feasibility; they are explicit prompts to involve the site's responsible safety process.
 
+`data.py` also returns elapsed-interval profiles: count, mean, median, 90th percentile and sample CV for each stage. An explicitly attested, eligible observation may set the single model CV to the larger observed stage CV. The report records the adopted variability source, while observations remain separate from assumptions by default.
+
 Alternatives: Streamlit would speed initial prototyping but add a larger dependency/UI runtime. React is unnecessary for this workflow. A custom simulator reduces dependencies but raises verification burden; use an independently written heap-based two-stage reference only in tests. Simod/Prosimos are not installed into the app because their package Python requirements exclude 3.12; Prosimos redistribution rights unresolved. Use separate Python 3.11 environments if later benchmarking is justified.
 
 Consequences: narrow but understandable model, reproducible local use, modest maintenance burden. Not production hosting. A true workforce scheduler or digital twin will need a new ADR, richer data and renewed release gates.
