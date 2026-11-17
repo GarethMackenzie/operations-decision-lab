@@ -1,14 +1,77 @@
 # Operations Decision Lab
 
-A local workbench for comparing **hypothetical picking and packing staffing**. Inspect process data, declare assumptions, compare every small-team allocation, and export a reproducible decision report.
+**Help operations analysts compare hypothetical picking and packing allocations before committing a small team's capacity.**
 
-**Synthetic research prototype — not externally validated staffing advice.** No customer interviews, adoption or productivity savings are claimed. The essential workflow uses no paid API and makes no external requests.
+**Business question:** Can any supported allocation satisfy the declared demand, service, budget and SLA constraints?
 
-[Download v0.1.0 and synthetic example reports](https://github.com/GarethMackenzie/operations-decision-lab/releases/tag/v0.1.0) · [Verification workflow](https://github.com/GarethMackenzie/operations-decision-lab/actions/workflows/verify.yml)
+> [!IMPORTANT]
+> **Decision supported**
+> An operations analyst compares candidate staffing allocations and identifies what needs further investigation.
+> If none passes the checks, the output is **NO CONFIRMED FEASIBLE OPTION**. A highest-ranked candidate is not automatically feasible, and a simulated result is not a validated staffing instruction.
 
-## The decision it makes explicit
+**Status:** local synthetic research prototype. **External operational validation:** not established. **Deployment:** local use; public hosting requires a separate design.
 
-At 18 arrivals/hour, 6 minutes picking and 7 minutes packing per order, two pickers can serve 20/hour but two packers only **17.14/hour**. No allocation of four dedicated workers sustains that demand. The default example reports **NO CONFIRMED FEASIBLE OPTION**, even if one allocation is best among those tested. Simulations stop at shift end and retain unfinished orders.
+[Source, installation and model reference](https://github.com/GarethMackenzie/operations-decision-lab)
+
+## Reproduce the decision
+
+After following the repository's Python 3.12 installation instructions:
+
+```sh
+python -m decision_lab demo --output reports/demo
+python -m decision_lab replay reports/demo/report.json
+python -m decision_lab serve
+```
+
+The demo exports HTML and JSON. Replay recomputes the numerical payload. The local workbench is available at `http://127.0.0.1:8765`.
+
+At 18 arrivals/hour, 6 minutes picking and 7 minutes packing per order, two packers have nominal capacity of approximately 17.14 orders/hour. No allocation of four dedicated workers sustains demand under those assumptions. The correct response is to expose the constraint, not force a recommendation.
+
+## See the result
+
+| Capture | Required content | Caption |
+|---|---|---|
+| `docs/images/decision.png` | Assumptions, selected allocation and evaluation results from an actual run | “Synthetic scenario; conditional simulation results.” |
+| `docs/images/no-feasible-option.png` | Default infeasible example and failed constraints | “No confirmed feasible option under the declared assumptions.” |
+| `docs/images/sensitivity.png` | Fixed allocation evaluated under changed assumptions | “Sensitivity analysis; not a prediction interval.” |
+
+<!-- Enable after capture:
+![Default scenario reports no confirmed feasible staffing option](docs/images/no-feasible-option.png)
+-->
+
+```mermaid
+flowchart LR
+    A[CSV] --> B[Data inspection]
+    B --> C[Explicit analyst assumptions]
+    C --> D[Candidate simulation]
+    D --> E[Separate candidate evaluation]
+    E --> F[Feasibility and sensitivity]
+    F --> G[HTML / JSON evidence]
+```
+
+Observations do not silently become simulation inputs. CLI and browser use the same Python core. Reports contain submitted input: review them before sharing.
+
+## Architectural decisions log
+
+This summary reflects the existing architecture record and documented model behavior.
+
+| Decision | Chosen approach | Alternative not adopted | Cost accepted | Revisit trigger |
+|---|---|---|---|---|
+| Interface | Flask/Waitress with plain browser assets | Streamlit or React | More explicit interface code; limited application scope | Multi-user requirements justify a new hosting ADR |
+| Simulation | SimPy with an independent test reference | A custom production simulator | Third-party dependency and narrow model assumptions | Supported process requirements exceed the validated model |
+| Candidate assessment | Separate selection and evaluation replications | Report only the best candidate's selection score | More simulation work; remaining model/input uncertainty | Measured runtime or evaluation requirements justify a revised experiment |
+
+## Evidence and limitations
+
+The repository documents hand calculations, boundary tests, conservation checks and an independent scheduling reference. Inspect those tests and release evidence before relying on a version. The current scope excludes shared workers, heterogeneous skills, overtime and multi-shift carryover. Report intervals concern replication means; they do not cover all input or model uncertainty.
+
+## Next evidence milestone
+
+Run a permitted, preregistered shadow-mode evaluation using event and roster data. Compare held-out observed outcomes with predictions and a simple baseline. Only a later approved intervention can establish operational effects.
+
+## Engineering evidence
+
+[Architecture and defensive programming](docs/engineering/ENGINEERING.md) · [External evaluation protocol](CASE_STUDY.md) · [Reusable README template](docs/engineering/README.template.md)
 
 ## Quick start — Python 3.12
 
