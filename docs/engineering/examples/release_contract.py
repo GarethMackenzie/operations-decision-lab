@@ -17,9 +17,7 @@ class ReleaseBlocked(ValueError):
 
 
 def require_release(required: frozenset[str], results: Iterable[CheckResult]) -> None:
-    if not required or any(
-        type(rule) is not str or not rule.strip() for rule in required
-    ):
+    if not required or any(type(rule) is not str or not rule.strip() for rule in required):
         raise ReleaseBlocked("Required rule IDs must be nonempty strings")
     seen: set[str] = set()
     for result in results:
