@@ -233,3 +233,20 @@ pre{{white-space:pre-wrap;overflow-wrap:anywhere;background:#f0f4f1;padding:20px
 <p>Includes original input CSV, observation bounds, assumptions, all replications,
 independent evaluation, sensitivity and environment versions.</p>
 <pre>{encoded}</pre></html>"""
+
+
+def verify_report(report: Any) -> None:
+    """Recompute the current report contract; environment metadata is informational."""
+    if not isinstance(report, dict):
+        raise ValueError("Report must be a JSON object.")
+    if type(report.get("schema_version")) is not int or report["schema_version"] != 3:
+        raise ValueError("Unsupported report schema version; regenerate with this version.")
+    if report.get("model_version") != __version__:
+        raise ValueError("Unsupported model version; replay with the original package version.")
+    if "inputs" not in report:
+        raise ValueError("Report inputs are missing.")
+    fresh = make_report(report["inputs"])
+    expected = {k: v for k, v in fresh.items() if k != "environment"}
+    actual = {k: v for k, v in report.items() if k != "environment"}
+    if canonical(expected) != canonical(actual):
+        raise ValueError("Replay mismatch: deterministic report fields or input hash differ.")
