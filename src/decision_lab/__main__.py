@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 from .data import MAX_BYTES, inspect_csv
-from .report import canonical, make_report, report_html
+from .report import canonical, make_report, report_html, verify_report
 from .web import create_app, sample_request
 
 
@@ -57,13 +57,8 @@ def main() -> None:
             print(canonical(inspect_csv(bounded_read(args.csv), args.start, args.end)))
         elif args.command == "replay":
             report = json.loads(bounded_read(args.report, 10_000_000))
-            fresh = make_report(report["inputs"])
-            if (
-                fresh["results"] != report["results"]
-                or fresh["input_sha256"] != report["input_sha256"]
-            ):
-                raise ValueError("Replay mismatch: numerical results or input hash differ.")
-            print("PASS: numerical results and input hash reproduced.")
+            verify_report(report)
+            print("PASS: all deterministic report fields and input hash reproduced.")
         else:
             body = (
                 sample_request()
